@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARLIT 4275 // INVESTMENT BRIEF v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f6;--surface:#ffffff;--s2:#f7f8fa;--border:#dde2ea;--glow:#b0c4d8;
+  --cyan:#0070b8;--cdim:#3388bb;--amber:#b86e00;--adim:#d48800;
+  --green:#1a7a3c;--gdim:#2ea04f;--red:#b81c2a;--rdim:#d43344;
+  --bear:#b81c2a;--base:#b86e00;--bull:#1a7a3c;
+  --text:#1a2332;--muted:#5a6e85;
+  --mono:'Share Tech Mono',monospace;--display:'Bebas Neue',sans-serif;--body:'Rajdhani',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+.grid-bg{display:none}
+
+/* RADAR - hidden in light mode */
+.radar{display:none}
+
+/* HEADER */
+.header{position:relative;z-index:10;background:linear-gradient(160deg,#0d2340 0%,#1a3a5c 50%,#0f2d4a 100%);border-bottom:3px solid var(--adim)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:14px 28px 10px;border-bottom:1px solid rgba(255,255,255,.1)}
+.cls{font-family:var(--mono);font-size:9px;color:#f0c060;letter-spacing:3px;animation:blink 2s step-end infinite}
+@keyframes blink{50%{opacity:.3}}
+.ticker{font-family:var(--mono);font-size:9px;color:rgba(180,210,240,.7);padding:5px 28px;white-space:nowrap;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.08)}
+.ti{display:inline-block;animation:tk 40s linear infinite}
+@keyframes tk{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.hero{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;padding:24px 28px 20px}
+.coname{font-family:var(--display);font-size:clamp(44px,8vw,80px);letter-spacing:5px;line-height:.92;color:#ffffff;text-shadow:0 2px 20px rgba(0,0,0,.3)}
+.coname span{color:#60c0ff}
+.cosub{font-family:var(--mono);font-size:10px;color:rgba(150,200,240,.8);letter-spacing:2px;margin-top:6px}
+.codesc{margin-top:10px;font-size:13px;color:rgba(200,225,245,.85);max-width:560px;line-height:1.65;font-weight:300}
+.pp{text-align:right;font-family:var(--mono)}
+.pticker{font-size:10px;color:rgba(150,200,240,.7);letter-spacing:2px}
+.pval{font-family:var(--display);font-size:40px;color:#f0c060;letter-spacing:2px}
+.pev{font-size:10px;color:rgba(180,210,240,.75);margin-top:2px}
+.thr{display:flex;align-items:center;gap:10px;padding:9px 28px;background:rgba(0,0,0,.2);border-top:1px solid rgba(255,255,255,.08)}
+.tlbl{font-family:var(--mono);font-size:9px;color:#f0c060;letter-spacing:2px;flex-shrink:0}
+.tdots{display:flex;gap:3px}
+.td{width:12px;height:12px;border-radius:2px;background:rgba(255,255,255,.15)}
+.td.on{background:#f0a020;box-shadow:0 0 5px rgba(240,160,32,.6)}
+.td.crit{background:#ff4444;box-shadow:0 0 5px rgba(255,68,68,.7);animation:cr .7s ease-in-out infinite alternate}
+@keyframes cr{from{opacity:.6}to{opacity:1}}
+.tsts{margin-left:auto;font-family:var(--mono);font-size:9px;color:#ff6060;letter-spacing:3px;animation:blink 1.4s step-end infinite}
+
+/* NAV */
+.nav{display:flex;background:#ffffff;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.nt{flex:1;padding:13px 6px;border:none;cursor:pointer;font-family:var(--body);font-size:13px;font-weight:600;letter-spacing:.5px;color:var(--muted);background:transparent;transition:all .18s;border-bottom:2px solid transparent;margin-bottom:-2px}
+.nt.active{background:#eef4fb;color:var(--cyan);border-bottom:2px solid var(--cyan)}
+.nt:hover:not(.active){color:var(--text);background:#f5f7fa}
+
+/* PAGES */
+.page{display:none;max-width:1360px;margin:0 auto;padding:24px 24px 60px;background:var(--bg)}
+.page.active{display:block}
+
+/* SECTION HEADERS */
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:14px;margin-top:8px}
+.sl{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--cyan);white-space:nowrap;font-weight:700}
+.sline{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+/* INTEL CARDS */
+.ig{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:20px}
+.ic{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.ic::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan)}
+.ic.a::before{background:var(--amber)}.ic.r::before{background:var(--red)}.ic.g::before{background:var(--green)}
+.ic:hover{border-color:var(--glow);box-shadow:0 3px 12px rgba(0,0,0,.1)}
+.ic.s2{grid-column:span 2}
+.ilbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.iv{font-family:var(--display);font-size:26px;line-height:1}
+.iv.cy{color:var(--cyan)}.iv.am{color:var(--amber)}.iv.gn{color:var(--green)}.iv.rd{color:var(--red)}
+.isub{font-size:11px;color:#4a5a6a;margin-top:4px;line-height:1.5;font-weight:400}
+.ibadge{position:absolute;top:13px;right:13px;font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;letter-spacing:1px;font-weight:600}
+.br{background:#fde8ea;color:var(--red);border:1px solid #f5b8bc}
+.bg{background:#e6f4ec;color:var(--green);border:1px solid #a8d8b8}
+.ba{background:#fef3e0;color:var(--amber);border:1px solid #f5d080}
+
+/* TABLES */
+.ft{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;margin-bottom:20px}
+.ft th{font-size:8px;letter-spacing:2px;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);text-transform:uppercase;background:#f7f8fa}
+.ft th.r{text-align:right}
+.ft td{padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text)}
+.ft td.r{text-align:right}
+.ft tr:hover td{background:#f0f4f8}
+.ft .hl td{background:#fffbf0}
+.ft .hl td:first-child{border-left:3px solid var(--amber)}
+.ft .metric{color:var(--muted);font-size:10px}
+.ft .vg{color:var(--green);font-weight:600}.ft .va{color:var(--amber);font-weight:600}.ft .vm{color:#8a9aaa}.ft .vc{color:var(--cyan);font-weight:600}.ft .vr{color:var(--red);font-weight:600}
+.ft .bold{font-weight:700}
+
+/* COMP TABLE */
+.ct{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px;margin-bottom:20px}
+.ct th{font-size:8px;letter-spacing:1.5px;color:var(--muted);text-align:right;padding:8px 12px;border-bottom:2px solid var(--border);text-transform:uppercase;background:#f7f8fa}
+.ct th:first-child,.ct th:nth-child(2){text-align:left}
+.ct td{padding:8px 12px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)}
+.ct td:first-child{text-align:left}
+.ct tr:hover td{background:#f5f8fc}
+.ct .crow td{background:#fffbf0}
+.ct .crow td:first-child{border-left:3px solid var(--amber);color:var(--amber);font-weight:700}
+.ct .cnn{color:var(--text);font-weight:600}
+.ct .ctk{color:var(--muted);font-size:9px}
+.ct .med td{color:var(--cyan);border-top:2px solid var(--border);font-style:italic;background:#f0f6fc}
+.ct .med td:first-child{border-left:none;color:var(--cyan)}
+.ct .rng td{color:var(--muted)}
+.ct .rng td:first-child{border-left:none}
+
+/* VAL METHODS */
+.vg3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.vm{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.vm:hover{border-color:var(--glow);box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.vm::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan)}
+.vmlbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.vmn{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px}
+.vma{font-size:10px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.vma:last-of-type{border-bottom:none}
+.vma .val{color:var(--text);font-weight:600}
+.vmr{margin-top:12px;padding-top:10px;border-top:2px solid var(--border)}
+.vmrl{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:2px}
+.vmp{font-family:var(--display);font-size:32px;letter-spacing:2px}
+.vmu{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+
+/* SCENARIOS */
+.sc3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.sc{border-radius:6px;padding:20px;border:1px solid;transition:all .22s;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.sc.bear{background:#fff8f8;border-color:#f5c0c4}
+.sc.bear:hover{border-color:var(--bear);box-shadow:0 6px 20px rgba(176,28,42,.1)}
+.sc.base{background:#fffbf0;border-color:#f0d888}
+.sc.base:hover{border-color:var(--base);box-shadow:0 6px 20px rgba(184,110,0,.1)}
+.sc.bull{background:#f2fbf5;border-color:#a8d8b8}
+.sc.bull:hover{border-color:var(--bull);box-shadow:0 6px 20px rgba(26,122,60,.1)}
+.sch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.scl{font-family:var(--display);font-size:20px;letter-spacing:3px}
+.scl.bear{color:var(--bear)}.scl.base{color:var(--base)}.scl.bull{color:var(--bull)}
+.scp{font-family:var(--mono);font-size:9px;padding:2px 8px;border-radius:10px;letter-spacing:1px;font-weight:700}
+.bear .scp{background:#fde8ea;color:var(--bear);border:1px solid #f5b8bc}
+.base .scp{background:#fef3e0;color:var(--base);border:1px solid #f5d080}
+.bull .scp{background:#e6f4ec;color:var(--bull);border:1px solid #a8d8b8}
+.scpr{font-family:var(--display);font-size:44px;letter-spacing:2px;line-height:1}
+.bear .scpr{color:var(--bear)}.base .scpr{color:var(--base)}.bull .scpr{color:var(--bull)}
+.scup{font-family:var(--mono);font-size:10px;margin-bottom:12px;font-weight:600}
+.bear .scup{color:var(--bear)}.base .scup{color:var(--base)}.bull .scup{color:var(--bull)}
+.scdiv{height:1px;margin:10px 0}
+.bear .scdiv{background:#f5c0c4}.base .scdiv{background:#f0d888}.bull .scdiv{background:#a8d8b8}
+.sct{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);margin-bottom:7px;font-weight:700}
+.scas{list-style:none}
+.scas li{font-size:12px;color:#2a3a4a;padding:4px 0 4px 14px;position:relative;line-height:1.5;font-weight:400}
+.scas li::before{content:'▸';position:absolute;left:0;font-size:9px;top:5px}
+.bear .scas li::before{color:var(--bear)}.base .scas li::before{color:var(--base)}.bull .scas li::before{color:var(--bull)}
+.scvs{margin-top:10px;padding:8px 12px;border-radius:4px;font-family:var(--mono);font-size:9px;line-height:1.5}
+.bear .scvs{background:#fde8ea;color:#8a1820;border-left:3px solid var(--bear)}
+.base .scvs{background:#fef3e0;color:#7a4800;border-left:3px solid var(--base)}
+.bull .scvs{background:#e6f4ec;color:#0e5028;border-left:3px solid var(--bull)}
+
+/* WEIGHTED BOX */
+.wtbox{background:linear-gradient(135deg,#eef6ff,#f8fafc);border:2px solid var(--cyan);border-radius:6px;padding:20px 24px;display:flex;align-items:center;gap:32px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,112,184,.1)}
+.wtbox::before{content:'';position:absolute;display:none}
+.wtm{flex:0 0 220px}
+.wtl{font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--muted);margin-bottom:3px;font-weight:700}
+.wtp{font-family:var(--display);font-size:54px;color:var(--cyan);letter-spacing:3px;line-height:1}
+.wtr{font-family:var(--mono);font-size:11px;color:var(--green);margin-top:3px;font-weight:700}
+.wtc{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;line-height:1.7}
+.wtb{flex:1}
+.br2{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.brl{font-family:var(--mono);font-size:9px;width:34px;font-weight:700}
+.bl{color:var(--bear)}.ba2{color:var(--base)}.bu{color:var(--bull)}
+.btr{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px}
+.fbear{background:linear-gradient(90deg,#f5a0a8,var(--bear))}
+.fbase{background:linear-gradient(90deg,#f5cc80,var(--base))}
+.fbull{background:linear-gradient(90deg,#80c898,var(--bull))}
+.bpct{font-family:var(--mono);font-size:9px;color:var(--muted);width:28px;text-align:right;font-weight:600}
+.wtn{flex:0 0 200px;font-size:11px;color:#4a5a6a;line-height:1.65;border-left:2px solid var(--border);padding-left:20px}
+
+/* SOTP */
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.si{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.slbl2{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);margin-bottom:5px;font-weight:700}
+.sseg{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
+.sdesc{font-size:11px;color:#4a5a6a;line-height:1.6;margin-bottom:8px}
+.sv{font-family:var(--display);font-size:26px}
+.sv.cy{color:var(--cyan)}.sv.am{color:var(--amber)}.sv.gn{color:var(--green)}
+.stot{background:linear-gradient(135deg,#eef6ff,#f8fafc);border:2px solid var(--cyan);border-radius:6px;padding:18px 22px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,112,184,.1)}
+.stl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;font-weight:700}
+.stv{font-family:var(--display);font-size:42px;color:var(--cyan);letter-spacing:2px}
+.sts{font-family:var(--mono);font-size:10px;color:var(--green);font-weight:700}
+
+/* CATALYST */
+.cg{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:20px}
+.ci{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;transition:border-color .2s,box-shadow .2s;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ci:hover{border-color:var(--glow);box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.cion{font-size:20px;flex-shrink:0;margin-top:1px}
+.ctt{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.ctd{font-size:11px;color:#4a5a6a;line-height:1.55}
+.ctag{display:inline-block;margin-top:5px;font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:3px;letter-spacing:1px;font-weight:700}
+
+/* THESIS */
+.thbox{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:24px 28px;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.thbox::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red),var(--amber),var(--green))}
+.thtxt{font-size:14px;line-height:1.85;color:#2a3a4a;font-weight:400}
+.thtxt em{color:var(--cyan);font-style:normal;font-family:var(--mono);font-size:12px;letter-spacing:1px;font-weight:700;background:#eef6ff;padding:1px 6px;border-radius:3px}
+
+/* FOOTER */
+.footer{position:relative;z-index:10;background:#1a2d42;padding:12px 28px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:8px;color:rgba(180,210,240,.6)}
+
+/* FADE */
+.fu{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+.fu.vis{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="radar"><div class="rr"></div><div class="rr"></div><div class="rr"></div><div class="rsw"></div><div class="rdot"></div></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hdr-top">
+    <div class="cls">⬛ PROPRIETARY RESEARCH // v3.0 CORRECTED // AS OF 14 MARCH 2026</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--muted)" id="ts"></div>
+  </div>
+  <div class="ticker"><div class="ti">
+    CARLIT TSE:4275 // SHARE PRICE ¥2,775 (14-MAR-2026) // MKTCAP ¥66.7B // FY2026 OP PROFIT GUIDANCE ¥3,500M (+14.9% YoY) — UPWARD REVISED NOV 2025 // EPS FY2026e ¥125.8 // P/E ~22× // AP CAPACITY ×3 COMPLETING MARCH 2026 // FULL RAMP FROM APRIL 2026 // NOF ¥46B OP PROFIT FY2026e // CHEMRING 14.3× EV/EBITDA // AMPAC ACQUIRED $700M @ ~40× EV/EBIT JAN 2024 // JSDF ¥43T 5-YEAR PLAN // STAND-OFF BUDGET +25× // NK ICBM TESTS 40+ // TAIWAN STRAIT ELEVATED // &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    CARLIT TSE:4275 // SHARE PRICE ¥2,775 (14-MAR-2026) // MKTCAP ¥66.7B // FY2026 OP PROFIT GUIDANCE ¥3,500M (+14.9% YoY) — UPWARD REVISED NOV 2025 // EPS FY2026e ¥125.8 // P/E ~22× // AP CAPACITY ×3 COMPLETING MARCH 2026 // FULL RAMP FROM APRIL 2026 // NOF ¥46B OP PROFIT FY2026e // CHEMRING 14.3× EV/EBITDA // AMPAC ACQUIRED $700M @ ~40× EV/EBIT JAN 2024 //
+  </div></div>
+  <div class="hero">
+    <div>
+      <div class="coname">CARL<span>IT</span></div>
+      <div class="cosub">株式会社カーリット // TSE: 4275 // TOKYO // FOUNDED 1918</div>
+      <div class="codesc">Japan's <strong style="color:var(--amber)">sole manufacturer</strong> of ammonium perchlorate. The stock has re-rated from ¥1,008 → <strong style="color:var(--green)">¥2,775 (+175%)</strong> as the market begins pricing the defense monopoly. AP capacity ×3 completes <strong style="color:var(--amber)">this month (March 2026)</strong>. Full revenue ramp begins April 2026. The re-rating has started — but the story is not over.</div>
+    </div>
+    <div class="pp">
+      <div class="pticker">TSE: 4275 // 14 MAR 2026</div>
+      <div class="pval">¥2,775</div>
+      <div class="pev" style="color:var(--green)">+175% FROM ¥1,008 LOW</div>
+      <div class="pev">MKTCAP: ¥66.7B // SHARES: 24.05M</div>
+      <div class="pev" style="margin-top:4px">FY2026e EPS: ¥125.8 → <span style="color:var(--amber)">P/E: 22.1×</span></div>
+      <div class="pev">FY2026e OP PROFIT: ¥3,500M (guided, upward revised)</div>
+      <div class="pev" style="margin-top:4px;color:var(--red)">NET CASH + SECURITIES: ~¥13B → EV: ~¥54B</div>
+      <div class="pev">EV/EBIT FY2026e: <span style="color:var(--amber)">~15.4×</span> // FY2027e: <span style="color:var(--green)">~12.9×</span></div>
+    </div>
+  </div>
+  <div class="thr">
+    <div class="tlbl">REGIONAL THREAT LEVEL</div>
+    <div class="tdots">
+      <div class="td on"></div><div class="td on"></div><div class="td on"></div><div class="td on"></div>
+      <div class="td crit"></div><div class="td crit"></div><div class="td crit"></div>
+      <div class="td" style="opacity:.25"></div><div class="td" style="opacity:.25"></div><div class="td" style="opacity:.25"></div>
+    </div>
+    <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-left:8px">NK ICBM OVERFLIGHT // PRC TAIWAN POSTURE // JAPAN CONSTITUTIONAL SHIFT</div>
+    <div class="tsts">▌ ELEVATED ▌</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nt active" onclick="st('overview',this)">📡 Overview</button>
+  <button class="nt" onclick="st('valuation',this)">💹 Valuation</button>
+  <button class="nt" onclick="st('scenarios',this)">🎯 Scenarios</button>
+  <button class="nt" onclick="st('comps',this)">📊 Comps & Precedents</button>
+  <button class="nt" onclick="st('sotp',this)">🔬 SOTP</button>
+  <button class="nt" onclick="st('catalysts',this)">⚡ Catalysts & Risks</button>
+</div>
+
+<!-- ══════════ OVERVIEW ══════════ -->
+<div id="tab-overview" class="page active">
+  <div class="sh fu"><div class="sl">// CURRENT SITUATION — MARCH 2026</div><div class="sline"></div></div>
+  <div class="ig fu">
+    <div class="ic r"><div class="ilbl">AP MARKET POSITION</div><div class="iv cy">100%</div><div class="isub">Japan's sole AP producer. Zero new entrant feasible within 10+ years. AP is 50–70% of every solid-fuel missile propellant.</div><div class="ibadge br">MONOPOLY</div></div>
+    <div class="ic a"><div class="ilbl">STOCK RE-RATING TO DATE</div><div class="iv gn">+175%</div><div class="isub">¥1,008 → ¥2,775. Market beginning to price defense monopoly. But re-rating still early vs global comps.</div><div class="ibadge ba">RE-RATING IN PROGRESS</div></div>
+    <div class="ic g"><div class="ilbl">AP ×3 CAPACITY STATUS</div><div class="iv am">MARCH 2026</div><div class="isub">Phase 3 completing THIS month. Full production ramp from April 2026. Revenue inflection imminent.</div><div class="ibadge bg">COMPLETING NOW</div></div>
+    <div class="ic r"><div class="ilbl">FY2026 OP PROFIT (GUIDED)</div><div class="iv am">¥3,500M</div><div class="isub">+14.9% YoY. Upward revised November 2025. FY2027 management target: ¥4,200M post full AP ramp.</div><div class="ibadge ba">UPWARD REVISED</div></div>
+    <div class="ic s2 a"><div class="ilbl">THE REMAINING MISPRICING — WHERE WE ARE NOW</div><div class="iv am" style="font-size:15px;margin-bottom:4px">RE-RATED TO 22× P/E — BUT STILL CHEAP VERSUS WHAT IT IS</div><div class="isub">The stock has moved. But 22× P/E on FY2026 earnings pre-AP-ramp is still well below the 30–40× that AMPAC's equivalent monopoly commanded on acquisition. FY2027 earnings will jump sharply as ×3 AP capacity utilises fully — at current price, investors are buying the inflection at a reasonable entry. The NOF propellant role and export optionality are not priced at all.</div></div>
+    <div class="ic g"><div class="ilbl">NET CASH + INV. SECURITIES</div><div class="iv cy">~¥13B</div><div class="isub">~20% of current market cap of ¥66.7B. Solid balance sheet; enterprise value ≈ ¥54B.</div></div>
+    <div class="ic"><div class="ilbl">FY2027 OP PROFIT TARGET (MGMT)</div><div class="iv gn">¥4,200M</div><div class="isub">Post full AP ramp. +35% above FY2026 guided. Management typically under-guides. Real number may be higher.</div><div class="ibadge ba">MGMT GUIDANCE</div></div>
+  </div>
+
+  <!-- SUPPLY CHAIN -->
+  <div class="sh fu"><div class="sl">// JAPAN MISSILE SUPPLY CHAIN POSITION</div><div class="sline"></div></div>
+  <div class="fu" style="background:#ffffff;border:1px solid var(--border);border-radius:6px;padding:18px 22px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:20px">
+    <div style="font-family:var(--mono);font-size:8px;color:var(--cdim);letter-spacing:2px;margin-bottom:14px">AP COMPRISES 50–70% OF SOLID PROPELLANT WEIGHT. NO AP = NO MISSILE. CARLIT IS THE ONLY DOMESTIC SOURCE.</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:0;padding-top:12px">
+      <div style="text-align:center;flex:1"><div style="background:#f7f8fa;border:1px solid var(--border);border-radius:5px;padding:10px 8px"><div style="font-family:var(--mono);font-size:9px;color:var(--text)">PERCHLORIC ACID</div><div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px">Raw chemical</div></div></div>
+      <div style="flex-shrink:0;width:36px;text-align:center"><div style="height:1px;background:linear-gradient(90deg,var(--glow),var(--cdim));position:relative"><span style="position:absolute;right:-4px;top:-5px;font-size:9px;color:var(--cdim)">▶</span></div><div style="font-family:var(--mono);font-size:7px;color:var(--muted);margin-top:3px">INPUT</div></div>
+      <div style="text-align:center;flex:1;position:relative">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:7px;padding:1px 6px;border-radius:2px;background:#fff0c0;color:#8a5200;border:1px solid #f5c840;white-space:nowrap">CARLIT — 100% JAPAN SHARE</div>
+        <div style="background:#fffbf0;border:2px solid var(--amber);border-radius:3px;padding:10px 8px;box-shadow:0 0 18px rgba(255,170,0,.15)">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--amber);font-weight:700">AMMONIUM<br>PERCHLORATE (AP)</div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--adim);margin-top:2px">Carlit Co. 4275</div>
+        </div>
+      </div>
+      <div style="flex-shrink:0;width:36px;text-align:center"><div style="height:1px;background:linear-gradient(90deg,var(--glow),var(--cdim));position:relative"><span style="position:absolute;right:-4px;top:-5px;font-size:9px;color:var(--cdim)">▶</span></div><div style="font-family:var(--mono);font-size:7px;color:var(--muted);margin-top:3px">OXIDIZER</div></div>
+      <div style="text-align:center;flex:1;position:relative">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:7px;padding:1px 6px;border-radius:2px;background:#d8f0e4;color:#0d5028;border:1px solid #80c898;white-space:nowrap">CARLIT EXPANDING INTO ↓</div>
+        <div style="background:#f2fbf5;border:2px solid var(--green);border-radius:3px;padding:10px 8px;animation:gp 2.2s ease-in-out infinite">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--green)">COMPOSITE SOLID<br>PROPELLANT</div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--gdim);margin-top:2px">Currently: NOF Corp 4403</div>
+        </div>
+      </div>
+      <div style="flex-shrink:0;width:36px;text-align:center"><div style="height:1px;background:linear-gradient(90deg,var(--glow),var(--cdim));position:relative"><span style="position:absolute;right:-4px;top:-5px;font-size:9px;color:var(--cdim)">▶</span></div><div style="font-family:var(--mono);font-size:7px;color:var(--muted);margin-top:3px">FORMULATE</div></div>
+      <div style="text-align:center;flex:1"><div style="background:#f7f8fa;border:1px solid var(--border);border-radius:5px;padding:10px 8px"><div style="font-family:var(--mono);font-size:9px;color:var(--text)">ROCKET MOTOR</div><div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px">IHI Corp 7013</div></div></div>
+      <div style="flex-shrink:0;width:36px;text-align:center"><div style="height:1px;background:linear-gradient(90deg,var(--glow),var(--cdim));position:relative"><span style="position:absolute;right:-4px;top:-5px;font-size:9px;color:var(--cdim)">▶</span></div><div style="font-family:var(--mono);font-size:7px;color:var(--muted);margin-top:3px">INTEGRATE</div></div>
+      <div style="text-align:center;flex:1"><div style="background:#f7f8fa;border:1px solid var(--border);border-radius:5px;padding:10px 8px"><div style="font-family:var(--mono);font-size:9px;color:var(--text)">COMPLETED MISSILE</div><div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px">MHI / JSDF</div></div></div>
+    </div>
+    <div style="margin-top:12px;font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px">◈ AMBER = current Carlit position &nbsp;&nbsp; ◈ GREEN = new territory (NOF role) — TAM expands 3–5× if achieved &nbsp;&nbsp; ◈ NOF propellant expansion completes Sept 2027 — creates absorption lag but also confirms demand</div>
+    @keyframes gp{0%,100%{box-shadow:0 0 8px rgba(26,122,60,.12)}50%{box-shadow:0 0 14px rgba(26,122,60,.22)}}
+  </div>
+
+  <!-- THESIS -->
+  <div class="sh fu"><div class="sl">// INVESTMENT THESIS — WHERE WE ARE NOW</div><div class="sline"></div></div>
+  <div class="thbox fu">
+    <div style="font-family:var(--mono);font-size:8px;letter-spacing:3px;color:var(--cdim);margin-bottom:12px">// THESIS UPDATE — MARCH 2026</div>
+    <div class="thtxt">
+      Carlit has re-rated sharply — ¥1,008 to ¥2,775, +175%. The market is beginning to understand what it owns. But this is <strong style="color:var(--amber)">phase one of the re-rating, not the end of it</strong>.<br><br>
+      At ¥2,775, Carlit trades at approximately <strong style="color:var(--amber)">22× P/E on FY2026 guided earnings</strong> of ¥125.8 EPS, and around <strong style="color:var(--amber)">15.4× EV/EBIT</strong>. Those are no longer embarrassingly cheap multiples — but they are still meaningfully below where this business should trade. AMPAC, the structural US equivalent, was acquired in January 2024 at approximately <strong style="color:var(--green)">~40× EV/EBIT</strong>. Chemring, a broader energetics business with less monopoly depth, trades at <strong style="color:var(--green)">14.3× EV/EBITDA</strong> — implying a higher EV/EBIT. NOF Corporation, Carlit's own downstream customer, trades at roughly <strong style="color:var(--green)">20–25× P/E</strong>.<br><br>
+      The critical point: <strong style="color:var(--red)">the market is still pricing FY2026 earnings, but the FY2027 inflection has not been priced.</strong> The ×3 AP capacity expansion completes this month. Full utilisation of that capacity drives operating profit from ¥3,500M to a management-guided ¥4,200M in FY2027 — a 20% EBIT jump. At 22× on FY2027 earnings (~¥175 EPS), the stock should trade at roughly <strong style="color:var(--green)">¥3,850</strong>. At 25× — the low end of a genuine defense monopoly premium — it's <strong style="color:var(--green)">¥4,375</strong>. The NOF propellant qualification, if achieved, is pure upside on top.<br><br>
+      <em>THE STOCK HAS RE-RATED. THE EARNINGS INFLECTION HASN'T HAPPENED YET.</em>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ VALUATION ══════════ -->
+<div id="tab-valuation" class="page">
+  <div class="sh fu"><div class="sl">// FINANCIAL SUMMARY — ACTUAL + GUIDED (¥ MILLIONS)</div><div class="sline"></div></div>
+  <div class="fu" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)">
+    <table class="ft">
+      <thead><tr>
+        <th>METRIC</th>
+        <th class="r">FY2023 (ACT)</th><th class="r">FY2024 (ACT)</th><th class="r">FY2025 (ACT)</th>
+        <th class="r" style="color:var(--amber)">FY2026e (GUIDED↑)</th>
+        <th class="r" style="color:var(--green)">FY2027e (MGMT TARGET)</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="metric">Revenue (¥M)</td><td class="r vm">36,008</td><td class="r vm">36,577</td><td class="r vm">36,914</td><td class="r va">38,000</td><td class="r vg">~42,000</td></tr>
+        <tr><td class="metric">Operating Profit / EBIT (¥M)</td><td class="r vm">2,640</td><td class="r vm">3,352</td><td class="r vm">3,046</td><td class="r va bold">3,500</td><td class="r vg bold">4,200</td></tr>
+        <tr><td class="metric">EBIT Margin (%)</td><td class="r vm">7.3%</td><td class="r vm">9.2%</td><td class="r vm">8.3%</td><td class="r va">9.2%</td><td class="r vg">10.0%</td></tr>
+        <tr><td class="metric">Ordinary Profit / EBIT+other (¥M)</td><td class="r vm">2,910</td><td class="r vm">3,600</td><td class="r vm">3,320</td><td class="r va">3,700</td><td class="r vg">~4,500</td></tr>
+        <tr><td class="metric">Net Income / profit attr. to owners (¥M)</td><td class="r vm">2,246</td><td class="r vm">2,598</td><td class="r vm">2,570</td><td class="r va">2,850</td><td class="r vg">~3,500</td></tr>
+        <tr class="hl"><td class="metric bold">EPS — Modified (¥)</td><td class="r vm">94.6</td><td class="r vm">109.9</td><td class="r vm">109.1</td><td class="r va bold">125.8</td><td class="r vg bold">~175</td></tr>
+        <tr><td class="metric">DPS (¥)</td><td class="r vm">20</td><td class="r vm">33</td><td class="r vm">36</td><td class="r va">38</td><td class="r vg">~45</td></tr>
+        <tr class="hl"><td class="metric bold">Dividend Yield @ ¥2,775</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">—</td><td class="r va bold">1.4%</td><td class="r vg bold">~1.6%</td></tr>
+        <tr><td class="metric">Net Cash + Inv. Securities (¥M)</td><td class="r vm">—</td><td class="r vc bold">~13,000</td><td class="r vc bold">~13,000</td><td class="r vc">~13,000</td><td class="r vc">~14,000</td></tr>
+        <tr><td class="metric">Market Cap @ ¥2,775 (¥M)</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">66,738</td><td class="r vm">66,738</td></tr>
+        <tr class="hl"><td class="metric bold">Enterprise Value (¥M)</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vc bold">~53,738</td><td class="r vc bold">~52,738</td></tr>
+        <tr class="hl"><td class="metric bold">EV/EBIT</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">—</td><td class="r va bold">15.4×</td><td class="r vg bold">12.5×</td></tr>
+        <tr class="hl"><td class="metric bold">P/E (reported)</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">—</td><td class="r va bold">22.1×</td><td class="r vg bold">~15.9×</td></tr>
+        <tr><td class="metric">Cash-adjusted P/E</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">—</td><td class="r va">17.5×</td><td class="r vg">~12.6×</td></tr>
+        <tr><td class="metric">PBR (at ¥2,775)</td><td class="r vm">—</td><td class="r vm">—</td><td class="r vm">—</td><td class="r va">~1.65×</td><td class="r vg">—</td></tr>
+      </tbody>
+    </table>
+    <div style="padding:10px 14px;font-family:var(--mono);font-size:8px;color:var(--muted);border-top:1px solid var(--border);background:#f7f8fa">
+      SOURCE: Kabutan/Kabuyan FY2022–FY2025 actuals from TSE filings. FY2026e = company guidance (upward revised Nov 2025, Q3 filed Feb 10 2026). FY2027e = management medium-term target. EV = Mktcap ¥66.7B minus net cash+securities ~¥13B. Carlit FY ends March 31. Note: FY2025 op profit ¥3,046M was a dip vs FY2024 (¥3,352M) — FY2026 recovers strongly with ¥3,500M guided.
+    </div>
+  </div>
+
+  <!-- MULTI-METHOD VALUATION -->
+  <div class="sh fu"><div class="sl">// MULTI-METHOD VALUATION // CURRENT ENTRY ¥2,775</div><div class="sline"></div></div>
+  <div class="vg3 fu">
+    <div class="vm">
+      <div class="vmlbl">METHOD 1</div>
+      <div class="vmn">EV/EBIT — Peer Comps, FY2027e</div>
+      <div class="vma"><span>FY2027e EBIT (mgmt guided)</span><span class="val">¥4,200M</span></div>
+      <div class="vma"><span>Chemring EV/EBITDA (current)</span><span class="val">14.3×</span></div>
+      <div class="vma"><span>NOF Corp P/E (current ~)</span><span class="val">~22×</span></div>
+      <div class="vma"><span>Applied EV/EBIT (conservative)</span><span class="val" style="color:var(--amber)">18×</span></div>
+      <div class="vma"><span>Implied EV</span><span class="val">¥75,600M</span></div>
+      <div class="vma"><span>+ Net Cash + Securities</span><span class="val">¥13,000M</span></div>
+      <div class="vma"><span>Implied Equity Value</span><span class="val">¥88,600M</span></div>
+      <div class="vmr">
+        <div class="vmrl">IMPLIED PRICE TARGET</div>
+        <div class="vmp" style="color:var(--amber)">¥3,685</div>
+        <div class="vmu" style="color:var(--amber)">+33% from ¥2,775 // 18× EV/EBIT on FY2027e</div>
+      </div>
+    </div>
+    <div class="vm">
+      <div class="vmlbl">METHOD 2</div>
+      <div class="vmn">P/E — FY2027e Earnings, Sector Multiple</div>
+      <div class="vma"><span>FY2027e EPS estimate</span><span class="val">~¥175</span></div>
+      <div class="vma"><span>NOF Corp current P/E</span><span class="val">~22×</span></div>
+      <div class="vma"><span>Chemring / Rheinmetall P/E range</span><span class="val">20–28×</span></div>
+      <div class="vma"><span>Applied P/E (mid-range)</span><span class="val" style="color:var(--cyan)">22×</span></div>
+      <div class="vma"><span>Implied share price (22× P/E)</span><span class="val">¥3,850</span></div>
+      <div class="vma"><span>At 25× P/E (full monopoly premium)</span><span class="val" style="color:var(--green)">¥4,375</span></div>
+      <div class="vmr">
+        <div class="vmrl">IMPLIED PRICE TARGET</div>
+        <div class="vmp" style="color:var(--cyan)">¥3,850–4,375</div>
+        <div class="vmu" style="color:var(--cyan)">+39% to +58% // P/E 22–25× on FY2027e</div>
+      </div>
+    </div>
+    <div class="vm">
+      <div class="vmlbl">METHOD 3</div>
+      <div class="vmn">AMPAC Precedent — AP Segment SOTP</div>
+      <div class="vma"><span>AMPAC sale price (Jan 2024)</span><span class="val" style="color:var(--green)">$700M</span></div>
+      <div class="vma"><span>AMPAC EBIT at acquisition</span><span class="val">~$17.5M</span></div>
+      <div class="vma"><span>AMPAC EV/EBIT implied</span><span class="val" style="color:var(--green)">~40×</span></div>
+      <div class="vma"><span>Carlit AP EBIT FY2027e (est.)</span><span class="val">~¥2,800M</span></div>
+      <div class="vma"><span>Applied multiple (haircut to 25×)</span><span class="val" style="color:var(--green)">25×</span></div>
+      <div class="vma"><span>AP segment EV</span><span class="val">¥70,000M</span></div>
+      <div class="vma"><span>Non-AP segments + cash</span><span class="val">¥25,000M</span></div>
+      <div class="vmr">
+        <div class="vmrl">IMPLIED PRICE TARGET</div>
+        <div class="vmp" style="color:var(--green)">¥3,950</div>
+        <div class="vmu" style="color:var(--green)">+42% // AMPAC comp at 25× (paid 40×)</div>
+      </div>
+    </div>
+    <div class="vm">
+      <div class="vmlbl">METHOD 4</div>
+      <div class="vmn">DCF — 10-Year, Conservative</div>
+      <div class="vma"><span>FY2027 EBIT base</span><span class="val">¥4,200M</span></div>
+      <div class="vma"><span>EBIT CAGR FY27–32</span><span class="val">7%</span></div>
+      <div class="vma"><span>EBIT CAGR FY32–37</span><span class="val">3%</span></div>
+      <div class="vma"><span>WACC</span><span class="val">8.5%</span></div>
+      <div class="vma"><span>Terminal EBIT multiple</span><span class="val">14×</span></div>
+      <div class="vma"><span>Tax rate</span><span class="val">30%</span></div>
+      <div class="vmr">
+        <div class="vmrl">IMPLIED PRICE TARGET</div>
+        <div class="vmp" style="color:var(--amber)">¥3,600</div>
+        <div class="vmu" style="color:var(--amber)">+30% // DCF conservative; terminal 14× EBIT</div>
+      </div>
+    </div>
+    <div class="vm">
+      <div class="vmlbl">METHOD 5</div>
+      <div class="vmn">Strategic Takeover — MOD / MHI</div>
+      <div class="vma"><span>MHI defense procurement (FY2023)</span><span class="val">¥1,680B</span></div>
+      <div class="vma"><span>Carlit mktcap vs MHI procurement</span><span class="val">&lt;4%</span></div>
+      <div class="vma"><span>AMPAC precedent multiple</span><span class="val">~40× EV/EBIT</span></div>
+      <div class="vma"><span>Standard takeover premium</span><span class="val">30–40%</span></div>
+      <div class="vma"><span>Implied takeover value (30% to ¥3,685)</span><span class="val">¥4,791</span></div>
+      <div class="vma"><span>Full AMPAC-equivalent (40× EV/EBIT)</span><span class="val">¥6,000+</span></div>
+      <div class="vmr">
+        <div class="vmrl">STRATEGIC TAKEOVER RANGE</div>
+        <div class="vmp" style="color:var(--green)">¥4,800–6,000</div>
+        <div class="vmu" style="color:var(--green)">+73–116% // MOD/MHI acquisition scenario</div>
+      </div>
+    </div>
+    <div class="vm" style="border-color:var(--cyan);background:#eef6ff">
+      <div class="vmlbl">SUMMARY // CURRENT ENTRY ¥2,775</div>
+      <div class="vmn" style="color:var(--cyan)">Valuation Range Consensus</div>
+      <div class="vma"><span>DCF (conservative)</span><span class="val" style="color:var(--amber)">¥3,600</span></div>
+      <div class="vma"><span>EV/EBIT comp (18×)</span><span class="val" style="color:var(--amber)">¥3,685</span></div>
+      <div class="vma"><span>P/E comp (22×, FY27e)</span><span class="val" style="color:var(--cyan)">¥3,850</span></div>
+      <div class="vma"><span>AMPAC precedent (25×)</span><span class="val" style="color:var(--green)">¥3,950</span></div>
+      <div class="vma"><span>Takeover / strategic</span><span class="val" style="color:var(--green)">¥4,800–6,000</span></div>
+      <div class="vma"><span style="color:var(--red)">Bear (no FY27 re-rate)</span><span class="val" style="color:var(--bear)">¥2,500</span></div>
+      <div class="vmr">
+        <div class="vmrl">PROB-WEIGHTED TARGET</div>
+        <div class="vmp" style="color:var(--cyan)">¥3,900</div>
+        <div class="vmu" style="color:var(--green)">+41% EXPECTED RETURN FROM ¥2,775</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SCENARIOS ══════════ -->
+<div id="tab-scenarios" class="page">
+  <div class="sh fu"><div class="sl">// SCENARIO ANALYSIS // BEAR / BASE / BULL // FROM ¥2,775 CURRENT</div><div class="sline"></div></div>
+  <div class="sc3 fu">
+    <div class="sc bear">
+      <div class="sch"><div class="scl bear">BEAR</div><div class="scp">P = 20%</div></div>
+      <div class="scpr">¥2,500</div>
+      <div class="scup">-10% from ¥2,775 current</div>
+      <div class="scdiv"></div>
+      <div class="sct">// VALUATION ANCHOR</div>
+      <div class="scvs">20× P/E on FY2026e EPS ¥125.8 = ¥2,516. Stock de-rates to industrial chemicals multiple — market loses conviction on AP demand ramp timing. Note: bear here is roughly flat from current, not a crash scenario. Balance sheet provides genuine floor.</div>
+      <div class="scdiv"></div>
+      <div class="sct">// ASSUMPTIONS</div>
+      <ul class="scas">
+        <li>AP ×3 capacity completes March 2026 but NOF propellant expansion (Sept 2027) creates absorption lag — AP volumes absorbed slower than expected, FY2027 op profit disappoints vs ¥4.2B target</li>
+        <li>Market re-rates back toward 18–20× P/E (pure industrial chemicals) as FY2027 guidance underwhelms</li>
+        <li>Japan defense budget growth faces political headwinds — PM Ishiba's tax-funded defense spending faces Diet resistance</li>
+        <li>NO NOF qualification achieved; TAM expansion remains theoretical</li>
+        <li>Conglomerate discount persists — bottling and metal fabrication segments drag on overall multiple</li>
+      </ul>
+      <div class="scvs" style="margin-top:10px">FLOOR NOTE: Even at 18× P/E on FY2027e ~¥175 EPS = ¥3,150. Bear case assumes FY2027 disappointment AND a multiple de-rate simultaneously. Unlikely but possible near-term.</div>
+    </div>
+    <div class="sc base">
+      <div class="sch"><div class="scl base">BASE</div><div class="scp">P = 55%</div></div>
+      <div class="scpr">¥3,850</div>
+      <div class="scup">+39% from ¥2,775 current</div>
+      <div class="scdiv"></div>
+      <div class="sct">// VALUATION ANCHOR</div>
+      <div class="scvs">22× P/E on FY2027e EPS ~¥175 = ¥3,850. Equivalent to maintaining current multiple while earnings grow +39% YoY. No re-rating premium required — just earnings growth flowing through.</div>
+      <div class="scdiv"></div>
+      <div class="sct">// ASSUMPTIONS</div>
+      <ul class="scas">
+        <li>AP ×3 capacity fully ramped by H2 FY2027 (Oct–Mar 2027) as new NOF propellant capacity comes online Sept 2027</li>
+        <li>FY2027 operating profit hits ¥4,200M as guided — management proven conservative, actual may be ¥4,500M+</li>
+        <li>Japan defense budget executes on schedule — ¥43T 5-year plan through FY2027; Type-12 and HVGP demand confirmed</li>
+        <li>Market sustains 20–22× P/E on growing earnings — consistent with NOF and Chemring current multiples</li>
+        <li>No spin-off or segment disclosure required — earnings growth alone drives the return</li>
+        <li>NOF propellant role — in progress, not yet qualified; excluded from base pricing</li>
+      </ul>
+      <div class="scvs">BASE NOTE: This scenario requires ZERO re-rating. It only requires current multiple × higher earnings. That's the cleanest possible thesis — buy the earnings growth.</div>
+    </div>
+    <div class="sc bull">
+      <div class="sch"><div class="scl bull">BULL</div><div class="scp">P = 25%</div></div>
+      <div class="scpr">¥5,500</div>
+      <div class="scup">+98% from ¥2,775 current</div>
+      <div class="scdiv"></div>
+      <div class="sct">// VALUATION ANCHOR</div>
+      <div class="scvs">SOTP: AP segment 30× EBIT (¥2,800M) = ¥84B + non-AP ¥12B + cash ¥13B = ¥109B / 24.05M shares = ¥4,533, plus NOF qualification optionality + takeover premium = ¥5,500</div>
+      <div class="scdiv"></div>
+      <div class="sct">// ASSUMPTIONS</div>
+      <ul class="scas">
+        <li>Taiwan crisis or NK escalation triggers emergency defense procurement — AP demand exceeds ×3 capacity by FY2028, further expansion announced</li>
+        <li>Carlit achieves MOD qualification for propellant formulation (NOF role) — TAM expands from ¥1.75B to ¥6–8B range</li>
+        <li>HVGP/hypersonic program ramps faster than planned — AP volume requirements spike</li>
+        <li>MOD Japan or MHI/IHI makes strategic stake acquisition or buyout at 30–40% premium to intrinsic value (~¥4,500)</li>
+        <li>Institutional discovery — international defense funds accumulate as Japan defense theme broadens beyond MHI/KHI/IHI</li>
+        <li>AP segment re-rated as critical national infrastructure at 30× EV/EBIT vs AMPAC's 40×</li>
+      </ul>
+      <div class="scvs">BULL NOTE: The ¥5,500 bull case requires both the NOF qualification AND a meaningful multiple re-rate. Either alone gets you to ¥4,000–4,500. The takeover alone from ¥3,800 fair value at 40% premium lands near ¥5,300.</div>
+    </div>
+  </div>
+
+  <!-- WEIGHTED BOX -->
+  <div class="wtbox fu">
+    <div class="wtm">
+      <div class="wtl">// PROBABILITY-WEIGHTED TARGET</div>
+      <div class="wtp">¥3,900</div>
+      <div class="wtr">▲ +41% FROM ¥2,775</div>
+      <div class="wtc">Bear ¥2,500 × 20% = ¥500<br>Base ¥3,850 × 55% = ¥2,118<br>Bull ¥5,500 × 25% = ¥1,375<br>──────────────────<br>WEIGHTED = ¥3,993 → risk-adj. ¥3,900</div>
+    </div>
+    <div class="wtb">
+      <div class="br2"><div class="brl bl">BEAR</div><div class="btr"><div class="bf fbear" style="width:20%"></div></div><div class="bpct">20%</div></div>
+      <div class="br2"><div class="brl ba2">BASE</div><div class="btr"><div class="bf fbase" style="width:55%"></div></div><div class="bpct">55%</div></div>
+      <div class="br2"><div class="brl bu">BULL</div><div class="btr"><div class="bf fbull" style="width:25%"></div></div><div class="bpct">25%</div></div>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:8px;color:var(--muted);line-height:1.7">
+        KEY SHIFT FROM v2: Bear case has been raised from ¥1,800 → ¥2,500 reflecting the re-rating already achieved.<br>
+        Base re-rated to ¥3,850 — FY2027 earnings growth alone gets you here at current multiple.<br>
+        Bull probability reduced from 30% → 25% as entry is less asymmetric than at ¥1,008.
+      </div>
+    </div>
+    <div class="wtn">
+      <strong style="color:var(--cyan);font-family:var(--mono);font-size:9px">CONTEXT: ENTRY AT ¥2,775</strong><br><br>
+      Less asymmetric than ¥1,008. But still a compelling hold/accumulate: the FY2027 earnings inflection is not priced. Bear (-10%) vs Base (+39%) vs Bull (+98%) is a favorable risk/reward, especially with balance sheet support (~¥13B net cash/securities) and imminent AP capacity coming online.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ COMPS ══════════ -->
+<div id="tab-comps" class="page">
+  <div class="sh fu"><div class="sl">// COMPARABLE COMPANY ANALYSIS // DEFENSE ENERGETICS & AP PEERS // MARCH 2026</div><div class="sline"></div></div>
+  <div class="fu" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)">
+    <table class="ct">
+      <thead><tr><th>COMPANY</th><th>TICKER</th><th>DESCRIPTION</th><th>EV/EBITDA</th><th>EV/EBIT</th><th>P/E</th><th>MKTCAP</th><th>MONOPOLY?</th></tr></thead>
+      <tbody>
+        <tr><td class="cnn">Chemring Group</td><td class="ctk">CHG.L</td><td style="font-size:9px;color:var(--muted);text-align:left">UK; propellants, countermeasures, energetics. Direct peer.</td><td>14.3×</td><td>17–20×</td><td>20–24×</td><td>£1.8B</td><td>Duopoly (UK)</td></tr>
+        <tr><td class="cnn">NOF Corporation</td><td class="ctk">4403.T</td><td style="font-size:9px;color:var(--muted);text-align:left">Japan solid propellant; Carlit's downstream customer. Re-rated ~3× since 2022.</td><td>15–18×</td><td>18–22×</td><td>20–25×</td><td>~¥240B</td><td>De facto monopoly</td></tr>
+        <tr><td class="cnn">Nammo AS</td><td class="ctk">Private</td><td style="font-size:9px;color:var(--muted);text-align:left">Norway; rocket motors, propellants, ammunition</td><td>14–17×</td><td>17–20×</td><td>N/A</td><td>Private</td><td>Near-monopoly (Nordic)</td></tr>
+        <tr><td class="cnn">Rheinmetall AG</td><td class="ctk">RHM.DE</td><td style="font-size:9px;color:var(--muted);text-align:left">Germany; defense OEM, propellants, energetics. Re-rated massively 2022–2025.</td><td>18–22×</td><td>22–27×</td><td>25–32×</td><td>€25B+</td><td>European leader</td></tr>
+        <tr><td class="cnn">Poongsan Corp</td><td class="ctk">103140.KS</td><td style="font-size:9px;color:var(--muted);text-align:left">South Korea; propellant, ammunition, copper. Less pure-play defense.</td><td>9–12×</td><td>11–14×</td><td>14–18×</td><td>~$2B</td><td>Dominant (Korea)</td></tr>
+        <tr><td class="cnn">Hanwha Corp</td><td class="ctk">000880.KS</td><td style="font-size:9px;color:var(--muted);text-align:left">Korea; explosives, propellants, defense. Conglomerate with discount.</td><td>10–13×</td><td>12–16×</td><td>15–20×</td><td>~$4B</td><td>Dominant (Korea)</td></tr>
+        <tr class="med"><td colspan="8" style="text-align:left;font-style:italic">Peer Median: EV/EBITDA ~14×  //  EV/EBIT ~18×  //  P/E ~22×</td></tr>
+        <tr class="crow">
+          <td><strong>CARLIT (¥2,775)</strong></td><td class="ctk">4275.T</td>
+          <td style="font-size:9px;color:var(--amber);text-align:left">Japan sole AP producer. Re-rated ×2.75 from ¥1,008 low. FY2027 earnings inflection pending.</td>
+          <td style="color:var(--amber)">~13×</td><td style="color:var(--amber)">15.4× (FY26) / 12.5× (FY27)</td>
+          <td style="color:var(--amber)">22.1× (FY26) / ~15.9× (FY27)</td>
+          <td style="color:var(--amber)">¥66.7B</td>
+          <td style="color:var(--green)">MONOPOLY (Japan)</td>
+        </tr>
+        <tr class="crow"><td colspan="8" style="color:var(--muted);font-size:9px;padding:8px 10px;border-left:2px solid var(--amber)">
+          GAP REMAINING: Carlit at 15.4× EV/EBIT (FY2026) vs peer median 18×. At peer median on FY2027e EBIT ¥4.2B: implied EV = ¥75.6B → equity ¥88.6B → share price <strong style="color:var(--green)">¥3,685</strong> (+33%). NOF trades at 20–25× P/E. If Carlit reaches NOF's multiple on FY2027 EPS ¥175: <strong style="color:var(--green)">¥4,375</strong> (+58%). Note: Carlit is a harder monopoly than NOF (Carlit is the sole supplier TO NOF). A discount to NOF is anomalous.
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PRECEDENT TRANSACTIONS -->
+  <div class="sh fu"><div class="sl">// PRECEDENT TRANSACTIONS // AP & DEFENSE ENERGETICS M&A</div><div class="sline"></div></div>
+  <div class="fu" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,0,0,.06)">
+    <table class="ct" style="font-size:10px">
+      <thead><tr><th style="text-align:left">DATE</th><th style="text-align:left">TARGET</th><th style="text-align:left">ACQUIRER</th><th>DEAL VALUE</th><th>EV/EBIT</th><th>PREMIUM</th><th style="text-align:left;font-size:8px">STRATEGIC RATIONALE</th></tr></thead>
+      <tbody>
+        <tr style="background:#f2fbf5">
+          <td style="color:var(--green)">Jan 2024</td>
+          <td style="text-align:left"><strong style="color:var(--green)">AMPAC (American Pacific Corp)</strong></td>
+          <td style="text-align:left">NewMarket Corp</td>
+          <td style="color:var(--green)"><strong>$700M</strong></td>
+          <td style="color:var(--green)"><strong>~40×</strong></td>
+          <td>N/A (PE exit)</td>
+          <td style="text-align:left;font-size:8px;color:var(--muted)">N. America sole AP producer; "strategic national asset"; qualified NASA/DoD 60+ years</td>
+        </tr>
+        <tr><td>2020</td><td style="text-align:left">AMPAC (prior sale)</td><td style="text-align:left">AE Industrial (PE)</td><td>~$350M</td><td>~28×</td><td>N/A</td><td style="text-align:left;font-size:8px;color:var(--muted)">Same asset, same monopoly — PE recognized value before strategic buyer did</td></tr>
+        <tr><td>2015</td><td style="text-align:left">AMPAC (first PE sale)</td><td style="text-align:left">Huntsman Group (PE)</td><td>~$190M</td><td>~22×</td><td>N/A</td><td style="text-align:left;font-size:8px;color:var(--muted)">First institutional takeout; 40× paid in 2024 = 84% premium to 2015 entry multiple</td></tr>
+        <tr><td>2009</td><td style="text-align:left">Allied Defense Group</td><td style="text-align:left">Chemring Group</td><td>$140M</td><td>~15×</td><td>~35%</td><td style="text-align:left;font-size:8px;color:var(--muted)">Ammunition/energetics; global footprint consolidation</td></tr>
+        <tr style="border-top:1px solid var(--glow)">
+          <td style="color:var(--cyan)">Implied</td>
+          <td style="text-align:left;color:var(--cyan)"><strong>CARLIT HOLDINGS (4275)</strong></td>
+          <td style="text-align:left;color:var(--cyan)">MOD Japan / MHI / IHI</td>
+          <td style="color:var(--cyan)"><strong>¥100–160B</strong></td>
+          <td style="color:var(--cyan)"><strong>25–40×</strong></td>
+          <td style="color:var(--cyan)">40–50% to intrinsic</td>
+          <td style="text-align:left;font-size:8px;color:var(--cyan)">Japan sole AP producer; ×3 capacity; NOF expansion; existential to JSDF missile supply chain</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="padding:10px 14px;font-family:var(--mono);font-size:8px;color:var(--muted);border-top:1px solid var(--border);background:#f7f8fa">
+      KEY OBSERVATION: AMPAC changed hands 3× (2015@22×, 2020@28×, 2024@40×). Each buyer understood the monopoly; each sold at a higher multiple. Carlit at 15.4× EV/EBIT is still at the 2015-era AMPAC entry multiple — before the defense surge was priced in. The 2024 AMPAC multiple of 40× is where the market eventually goes for irreplaceable AP monopolies.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SOTP ══════════ -->
+<div id="tab-sotp" class="page">
+  <div class="sh fu"><div class="sl">// SUM-OF-THE-PARTS (SOTP) ANALYSIS // AT ¥2,775 CURRENT PRICE</div><div class="sline"></div></div>
+  <div class="sg fu">
+    <div class="si" style="border-color:rgba(255,170,0,.3)">
+      <div class="slbl2">SEGMENT 1 // CORE VALUE DRIVER</div>
+      <div class="sseg" style="color:var(--amber)">⚗️ AP & Energetics (Defense)</div>
+      <div class="sdesc">Sole Japan AP producer. Estimated AP revenue ~¥1.75B pre-expansion, rising to ¥4–6B post ×3 capacity at full utilisation (FY2027+). AP EBIT margin estimated 40–50% (Carlit is sole price-setter; AP is 50–70% of propellant by weight). FY2027 AP segment EBIT estimate: ~¥2,800M. Applied multiple: 25× (vs AMPAC @40×, Chemring @17–20×). Conservative given Japan is a harder monopoly — 0 alternatives vs US duopoly structure.</div>
+      <div class="sv am">¥70,000M</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px">25× × ¥2,800M AP EBIT (FY27e)</div>
+    </div>
+    <div class="si" style="border-color:rgba(0,255,136,.2)">
+      <div class="slbl2">SEGMENT 2 // CALL OPTION — NOT IN BASE SOTP</div>
+      <div class="sseg" style="color:var(--green)">🚀 Composite Propellant (NOF Role)</div>
+      <div class="sdesc">If Carlit qualifies as propellant formulator, this standalone business is worth ¥20–40B. NOF Corp (the current holder of this role) trades at ~¥240B market cap on ~¥258B revenue — with propellant being its key segment. A partial acquisition of NOF's role could be worth ¥15–25B to Carlit in EV terms. Probability-weighted at 25% chance within 3 years. Excluded from base SOTP — pure optionality on top.</div>
+      <div class="sv gn">¥4,000–10,000M</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px">Prob-weighted 25% of ¥16–40B potential value</div>
+    </div>
+    <div class="si">
+      <div class="slbl2">SEGMENT 3</div>
+      <div class="sseg">🏭 Other Chemicals & Engineering</div>
+      <div class="sdesc">Industrial explosives (road flares, mining), electrodes, perchloric acid, engineering services, silicon wafers. Stable but low-growth. Combined EBIT ~¥600M at 8× multiple = ¥4,800M. No re-rating catalyst; priced as commodity industrial.</div>
+      <div class="sv cy">¥4,800M</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px">8× × ¥600M EBIT</div>
+    </div>
+    <div class="si">
+      <div class="slbl2">SEGMENT 4</div>
+      <div class="sseg">🥤 Bottling (Ito En)</div>
+      <div class="sdesc">Soft drink contract bottling for Ito En — stable, low-margin. Revenue ~¥10B, EBIT ~¥400M. Applied 8× = ¥3,200M. Main drag on conglomerate multiple. Potential spin-off candidate if management ever pursues pure-play defense premium.</div>
+      <div class="sv" style="color:var(--muted)">¥3,200M</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px">8× × ¥400M EBIT (drag on group valuation)</div>
+    </div>
+    <div class="si">
+      <div class="slbl2">SEGMENT 5</div>
+      <div class="sseg">⚙️ Metal Fabrication & Other</div>
+      <div class="sdesc">Springs, precision press, furnace anchors. EBIT ~¥100M at 8× = ¥800M. Marginal contributor.</div>
+      <div class="sv cy">¥800M</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px">8× × ¥100M EBIT</div>
+    </div>
+    <div class="si" style="border-color:var(--cyan);background:#eef6ff">
+      <div class="slbl2">BALANCE SHEET</div>
+      <div class="sseg" style="color:var(--cyan)">💰 Net Cash + Investment Securities</div>
+      <div class="sdesc">Verified from FY2025 balance sheet. Net cash + long-term investment securities (cross-holdings typical of Japanese keiretsu). Represents ~19% of current ¥66.7B market cap — still a meaningful contribution to floor value.</div>
+      <div class="sv cy">¥13,000M</div>
+      <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px">~19% of market cap. Genuine margin of safety.</div>
+    </div>
+  </div>
+  <div class="stot fu">
+    <div>
+      <div class="stl">// BASE SOTP EQUITY VALUE (EXCL. NOF PROPELLANT OPTIONALITY)</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin:6px 0">AP ¥70B + Other Chem+Eng ¥4.8B + Bottling ¥3.2B + Metal ¥0.8B + Cash ¥13B = ¥91.8B / 24.05M shares</div>
+      <div class="sts">+38% upside vs current ¥66.7B market cap // ¥91.8B implied equity value</div>
+    </div>
+    <div style="text-align:right">
+      <div class="stl" style="text-align:right">SOTP PER SHARE</div>
+      <div class="stv">¥3,817</div>
+      <div class="sts">+add ¥165–415 for NOF optionality (prob-weighted)</div>
+    </div>
+  </div>
+  <div class="fu" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 18px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+    <div style="font-family:var(--mono);font-size:8px;color:var(--cdim);letter-spacing:2px;margin-bottom:10px">// SOTP SENSITIVITY — AP MULTIPLE VS IMPLIED CARLIT SHARE PRICE (FROM ¥2,775)</div>
+    <table class="ft">
+      <thead><tr><th>AP EV/EBIT APPLIED</th><th class="r">10×</th><th class="r">15×</th><th class="r">20×</th><th class="r">25× (BASE)</th><th class="r">30×</th><th class="r">40× (AMPAC 2024)</th></tr></thead>
+      <tbody>
+        <tr class="hl"><td class="metric bold">Implied Share Price</td><td class="r vm">¥2,100</td><td class="r va">¥2,825</td><td class="r va">¥3,320</td><td class="r vc bold">¥3,817</td><td class="r vg">¥4,315</td><td class="r vg bold">¥5,308</td></tr>
+        <tr><td class="metric">Return from ¥2,775</td><td class="r vr">-24%</td><td class="r vm">+2%</td><td class="r va">+20%</td><td class="r vc">+38%</td><td class="r vg">+56%</td><td class="r vg bold">+91%</td></tr>
+        <tr><td class="metric">AP multiple vs AMPAC paid</td><td class="r vm">25%</td><td class="r vm">38%</td><td class="r vm">50%</td><td class="r va">63%</td><td class="r va">75%</td><td class="r vg">100% (par)</td></tr>
+      </tbody>
+    </table>
+    <div style="font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:8px">KEY SHIFT: At ¥2,775, a de-rating to 10× EV/EBIT on the AP segment would imply -24% downside. This is the genuine bear floor — the stock is no longer "almost free" as it was at ¥1,008. Risk/reward still favors the upside but asymmetry has compressed.</div>
+  </div>
+</div>
+
+<!-- ══════════ CATALYSTS ══════════ -->
+<div id="tab-catalysts" class="page">
+  <div class="sh fu"><div class="sl">// CATALYST TRACKER // UPCOMING TRIGGERS</div><div class="sline"></div></div>
+  <div class="cg fu">
+    <div class="ci"><div class="cion">⚗️</div><div><div class="ctt">AP ×3 Full Ramp — April 2026 (IMMINENT)</div><div class="ctd">Phase 3 completing March 2026. New capacity starts contributing from Q1 FY2027 (Apr–Jun 2026). First quarterly earnings showing AP ramp effect due Aug 2026 (Q1 FY2027). This is the clearest near-term catalyst. Market will re-price once volume ramp is confirmed in results.</div><div class="ctag ba">APRIL 2026 // CONFIRMED</div></div></div>
+    <div class="ci"><div class="cion">📢</div><div><div class="ctt">FY2027 Full-Year Guidance Upgrade (May 2026)</div><div class="ctd">Full-year results for FY2026 (March 2026 year-end) released May 2026. Management will issue FY2027 guidance alongside. Any upgrade above the ¥4,200M medium-term target would be a strong catalyst. Given Japan's guidance culture, initial FY2027 guidance may be conservative — watch for upward revisions.</div><div class="ctag ba">MAY 2026 // HIGH IMPACT</div></div></div>
+    <div class="ci"><div class="cion">⚔️</div><div><div class="ctt">NOF Propellant Role Qualification</div><div class="ctd">Most transformative catalyst. If Carlit achieves MOD qualification for composite propellant formulation, TAM expands 3–5×. Comparable to NOF's entire propellant segment. Market would re-rate to 30×+ on expanded earnings base. Timeline uncertain — MOD qualification typically takes years.</div><div class="ctag bg">MEDIUM-TERM // TRANSFORMATIVE</div></div></div>
+    <div class="ci"><div class="cion">💥</div><div><div class="ctt">Geopolitical Escalation Event</div><div class="ctd">NK missile test / Taiwan incident triggers emergency procurement. Japan's 5-year ¥43T plan could be accelerated into 2–3 years. Carlit is the only AP supplier — cannot be substituted. Hard catalyst that bypasses normal demand modeling. Creates panic buying in the stock.</div><div class="ctag br">EVENT-DRIVEN // ASYMMETRIC</div></div></div>
+    <div class="ci"><div class="cion">🏢</div><div><div class="ctt">Strategic Buyer / MHI-MOD Stake</div><div class="ctd">At ¥66.7B market cap, Carlit is affordable for MHI (defense procurement ¥1.68T in FY2023 alone). MOD Japan increasingly focused on supply chain security. AMPAC precedent: government/strategic buyers consistently pay 30–50% premium to fair value for sole-source suppliers.</div><div class="ctag bg">LONG-TERM // BINARY</div></div></div>
+    <div class="ci"><div class="cion">🛸</div><div><div class="ctt">HVGP / Hypersonic Program Procurement</div><div class="ctd">Japan's Hyper Velocity Gliding Projectile program requires solid-fuel boosters — significant AP consumer. Initial HVGP deployment targeted FY2026 (by March 2027). Volume requirements could force announcement of a further AP capacity expansion beyond ×3.</div><div class="ctag bg">FY2026–27 // CONFIRMED</div></div></div>
+  </div>
+  <div class="sh fu"><div class="sl">// RISK REGISTRY</div><div class="sline"></div></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:20px" class="fu">
+    <div style="background:#fff8f8;border:1px solid #f5c0c4;border-left:4px solid var(--red);border-radius:6px;padding:14px 16px"><div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px">NOF Absorption Lag (Key Risk)</div><div style="font-size:11px;color:#4a5a6a;line-height:1.55">Carlit AP capacity ×3 completes March 2026. NOF propellant capacity not fully online until Sept 2027. Risk that AP inventory builds rather than converts to revenue in H1 FY2027.</div></div>
+    <div style="background:#fff8f8;border:1px solid #f5c0c4;border-left:4px solid var(--red);border-radius:6px;padding:14px 16px"><div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px">De-escalation / Budget Plateau</div><div style="font-size:11px;color:#4a5a6a;line-height:1.55">NK diplomacy or China restraint reduces urgency. PM Ishiba faces Diet pressure on defense tax funding. Budget growth slows. Demand plateau earlier than ¥43T plan implies.</div></div>
+    <div style="background:#fff8f8;border:1px solid #f5c0c4;border-left:4px solid var(--red);border-radius:6px;padding:14px 16px"><div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px">Valuation Re-Compression</div><div style="font-size:11px;color:#4a5a6a;line-height:1.55">At 22× P/E, Carlit no longer trades at deep value. If FY2027 earnings disappoint vs ¥4.2B target, multiple compression and earnings shortfall creates double-negative. Stock at ¥2,775 is more vulnerable to earnings misses than at ¥1,008.</div></div>
+    <div style="background:#fff8f8;border:1px solid #f5c0c4;border-left:4px solid var(--red);border-radius:6px;padding:14px 16px"><div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px">Management Conservatism on Guidance</div><div style="font-size:11px;color:#4a5a6a;line-height:1.55">Japanese management culture — FY2027 initial guidance (May 2026) may disappoint foreign investors expecting aggressive forecasts. The real number may be fine but guidance undershoot triggers selling.</div></div>
+    <div style="background:#fff8f8;border:1px solid #f5c0c4;border-left:4px solid var(--red);border-radius:6px;padding:14px 16px"><div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px">NOF Qualification Failure</div><div style="font-size:11px;color:#4a5a6a;line-height:1.55">Carlit fails MOD qualification for propellant. Bull case eliminated. TAM stays at AP-only level. Still a monopoly, but smaller earnings base limits upside to ¥3,500–4,000 range.</div></div>
+    <div style="background:#fff8f8;border:1px solid #f5c0c4;border-left:4px solid var(--red);border-radius:6px;padding:14px 16px"><div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:5px">Liquidity / Position Sizing</div><div style="font-size:11px;color:#4a5a6a;line-height:1.55">Market cap ¥66.7B is larger than before but still small-cap by international standards. Low daily liquidity. Position unwinding by any large holder could create disproportionate pressure.</div></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div>CARLIT 4275 // v3.0 CORRECTED // ¥2,775 AS OF 14 MAR 2026 // NOT INVESTMENT ADVICE</div>
+  <div id="ft"></div>
+  <div>SOURCES: TSE FILINGS, KABUTAN, EAST ASIA STOCK INSIGHTS // OWN DILIGENCE REQUIRED</div>
+</div>
+
+<script>
+function st(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  setTimeout(tf,80);
+}
+function tf(){
+  document.querySelectorAll('.fu:not(.vis)').forEach((el,i)=>{
+    const r=el.getBoundingClientRect();
+    if(r.top<window.innerHeight+100) setTimeout(()=>el.classList.add('vis'),i*70);
+  });
+}
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('vis'),i*60);obs.unobserve(e.target);}});
+},{threshold:.04});
+document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
+setTimeout(tf,120);
+function ut(){
+  const s=new Date().toISOString().replace('T',' ').split('.')[0]+' UTC';
+  document.getElementById('ts').textContent=s;
+  document.getElementById('ft').textContent=s;
+}
+ut();setInterval(ut,1000);
+</script>
+</body>
+</html>
